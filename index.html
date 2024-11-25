@@ -1,255 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MrLippie</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='url(%23a)'/><defs><pattern id='a' patternUnits='userSpaceOnUse' width='100' height='100'><image href='https://yt3.googleusercontent.com/k6VkGNxRedW7Fteo5MFcDfxIlSSh1ePdFoVG3hGW8uQ3SNCW7Bm1eTDvI2fa-w33hR10HCeBMds=s160-c-k-c0x00ffffff-no-rj' width='100' height='100'/></pattern></defs></svg>" type="image/svg+xml">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s, color 0.3s;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MrLippie</title>
+  <link rel="icon" href="path-to-icon.png" type="image/png">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+  <script defer src="script.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
 
-        body.dark-mode {
-            background-color: #333;
-            color: #f4f4f4;
-        }
+    header {
+      text-align: center;
+      padding: 20px;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    header .profile-picture {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: 20px;
-            background-color: #ff4757;
-            color: white;
-            position: relative;
-        }
+    h1, h2 {
+      font-size: 24px;
+    }
 
-        .header h1 {
-            margin: 0;
-            font-size: 2em;
-        }
+    .comments-section {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #1e1e1e;
+      border-radius: 12px;
+    }
 
-        .header p {
-            margin: 10px 0 0;
-        }
+    input, textarea {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
 
-        .toggle-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 34px;
-        }
+    button {
+      background-color: #6200ee;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
+    button:hover {
+      background-color: #3700b3;
+    }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+    #commentsContainer {
+      margin-top: 20px;
+    }
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            border-radius: 50%;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.4s;
-        }
-
-        input:checked + .slider {
-            background-color: #4CAF50;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .image-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .image-container img {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .button {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #ff6b81;
-            color: white;
-            text-align: center;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 1.2em;
-            transition: background-color 0.3s;
-        }
-
-        .button:hover {
-            background-color: #e14b6d;
-        }
-
-        .comments-section {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 15px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body.dark-mode .comments-section {
-            background-color: #444;
-            color: #f4f4f4;
-        }
-
-        textarea, input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 1em;
-            font-family: Arial, sans-serif; /* Zelfde stijl als textarea */
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .comment {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: #e9e9e9;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body.dark-mode .comment {
-            background-color: #555;
-            color: #f4f4f4;
-        }
-    </style>
+    .comment {
+      padding: 10px;
+      border-bottom: 1px solid #333;
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>Fanpage of MrLippie</h1>
-            <p>The official fanpage of MrLippie (the famous YouTuber)</p>
-            <div class="toggle-container">
-                <label class="switch">
-                    <input type="checkbox" id="mode-toggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </header>
+<body onload="loadComments()">
+  <header>
+    <img src="path-to-image.png" alt="MrLippie" class="profile-picture">
+    <h1>Fanpage of MrLippie</h1>
+    <p>The official fanpage of MrLippie (the famous YouTuber)</p>
+  </header>
 
-        <div class="image-container">
-            <img src="https://yt3.googleusercontent.com/k6VkGNxRedW7Fteo5MFcDfxIlSSh1ePdFoVG3hGW8uQ3SNCW7Bm1eTDvI2fa-w33hR10HCeBMds=s160-c-k-c0x00ffffff-no-rj" alt="MrLippie">
-            <a href="https://www.youtube.com/@Mrlippie/featured" class="button">Subscribe to MrLippie!</a>
-        </div>
-
-        <div class="comments-section">
-            <h2>Leave a message</h2>
-            <input type="text" id="name" placeholder="Your name">
-            <textarea id="message" placeholder="Your message"></textarea>
-            <button id="submit-comment">Submit</button>
-            <div id="comments"></div>
-        </div>
-    </div>
-
-    <script>
-        const toggleSwitch = document.getElementById('mode-toggle');
-        const body = document.body;
-        const commentsDiv = document.getElementById('comments');
-        const submitButton = document.getElementById('submit-comment');
-
-        let comments = JSON.parse(localStorage.getItem('comments')) || [];
-
-        const updateComments = () => {
-            commentsDiv.innerHTML = '';
-            comments.forEach((comment, index) => {
-                const commentDiv = document.createElement('div');
-                commentDiv.classList.add('comment');
-                commentDiv.textContent = `${comment.name}: ${comment.message}`;
-                commentsDiv.appendChild(commentDiv);
-            });
-        };
-
-        toggleSwitch.addEventListener('change', () => {
-            body.classList.toggle('dark-mode');
-        });
-
-        submitButton.addEventListener('click', () => {
-            const name = document.getElementById('name').value;
-            const message = document.getElementById('message').value;
-
-            if (message.startsWith('/cleancomments')) {
-                comments = [];
-            } else if (message.trim() && name.trim()) {
-                if (comments.length >= 10) {
-                    comments.shift();
-                }
-                comments.push({ name, message });
-            }
-
-            localStorage.setItem('comments', JSON.stringify(comments));
-            updateComments();
-
-            // Clear the input fields
-            document.getElementById('name').value = '';
-            document.getElementById('message').value = '';
-        });
-
-        updateComments();
-    </script>
+  <main>
+    <section class="comments-section">
+      <h2>Leave a Message</h2>
+      <input type="text" id="nameInput" placeholder="Your name">
+      <textarea id="messageInput" placeholder="Your message"></textarea>
+      <button onclick="submitComment()">Submit</button>
+      <div id="commentsContainer"></div>
+    </section>
+  </main>
 </body>
 </html>
