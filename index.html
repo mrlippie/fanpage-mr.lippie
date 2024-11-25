@@ -38,13 +38,12 @@
             margin: 0;
         }
 
-        /* Slider cutout */
         .slider-cutout {
             position: absolute;
             top: -6px;
             right: -6px;
-            width: 76px; /* Slider + 16px margin */
-            height: 44px; /* Slider + 10px margin */
+            width: 76px;
+            height: 44px;
             background-color: #ff4757;
             border-radius: 20px;
             z-index: 1;
@@ -53,7 +52,6 @@
             align-items: center;
         }
 
-        /* Switch */
         .switch {
             position: relative;
             display: inline-block;
@@ -155,6 +153,7 @@
 
         .comments.dark-mode {
             background-color: #555;
+            color: #f4f4f4;
         }
     </style>
 </head>
@@ -196,29 +195,34 @@
         const commentForm = document.getElementById("comment-form");
         const commentsDiv = document.getElementById("comments");
         const maxComments = 10;
-        let comments = [];
+        let comments = JSON.parse(localStorage.getItem("comments")) || [];
 
         toggleSwitch.addEventListener("change", () => {
             body.classList.toggle("dark-mode");
             commentsSection.classList.toggle("dark-mode");
+            renderComments();
         });
 
         commentForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            const name = document.getElementById("name").value;
-            const message = document.getElementById("message").value;
+            const name = document.getElementById("name").value.trim();
+            const message = document.getElementById("message").value.trim();
 
             if (name.toLowerCase() === "/cleancomments") {
                 comments = [];
+                saveComments();
                 renderComments();
                 return;
             }
 
+            if (!name || !message) return;
+
             if (comments.length >= maxComments) {
-                comments.shift(); // Verwijder de oudste comment
+                comments.shift();
             }
 
             comments.push(`${name}: ${message}`);
+            saveComments();
             renderComments();
 
             document.getElementById("name").value = "";
@@ -228,6 +232,13 @@
         function renderComments() {
             commentsDiv.innerHTML = comments.map((comment) => `<div class="comments">${comment}</div>`).join("");
         }
+
+        function saveComments() {
+            localStorage.setItem("comments", JSON.stringify(comments));
+        }
+
+        // Initial render
+        renderComments();
     </script>
 </body>
 </html>
