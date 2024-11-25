@@ -194,7 +194,7 @@
 
         <div class="image-container">
             <img src="https://yt3.googleusercontent.com/k6VkGNxRedW7Fteo5MFcDfxIlSSh1ePdFoVG3hGW8uQ3SNCW7Bm1eTDvI2fa-w33hR10HCeBMds=s160-c-k-c0x00ffffff-no-rj" alt="MrLippie">
-            <a href="https://www.youtube.com/@Mrlippie/featured" target="_blank" class="button">Subscribe to MrLippie!</a>
+            <a href="https://www.youtube.com/@Mrlippie/featured" class="button">Subscribe to MrLippie!</a>
         </div>
 
         <div class="comments-section">
@@ -215,11 +215,11 @@
         let comments = JSON.parse(localStorage.getItem('comments')) || [];
 
         const updateComments = () => {
-            commentsDiv.innerHTML = '';
-            comments.forEach((comment, index) => {
+            commentsDiv.innerHTML = ''; // Leeg de comments sectie
+            comments.forEach((comment) => {
                 const commentDiv = document.createElement('div');
                 commentDiv.classList.add('comment');
-                commentDiv.textContent = `${comment.name}: ${comment.message}`;
+                commentDiv.textContent = `${comment.name}: ${comment.message}`; // Correcte template literal
                 commentsDiv.appendChild(commentDiv);
             });
         };
@@ -236,20 +236,20 @@
                 comments = [];
             } else if (message.trim() && name.trim()) {
                 if (comments.length >= 10) {
-                    comments.shift();
+                    comments.shift(); // Verwijder het eerste comment als er al 10 zijn
                 }
                 comments.push({ name, message });
             }
 
-            localStorage.setItem('comments', JSON.stringify(comments));
-            updateComments();
+            localStorage.setItem('comments', JSON.stringify(comments)); // Bewaar comments in localStorage
+            updateComments(); // Werk de comments bij
 
-            // Clear the input fields
+            // Leeg de invoervelden
             document.getElementById('name').value = '';
             document.getElementById('message').value = '';
         });
 
-        updateComments();
+        updateComments(); // Begin met het bijwerken van de comments bij het laden van de pagina
     </script>
 </body>
 </html>
