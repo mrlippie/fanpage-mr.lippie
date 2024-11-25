@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fanpage of MrLippie</title>
+    <title>MrLippie Fanpage</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,20 +18,24 @@
             color: #f4f4f4;
         }
         .container {
-            margin: 20px;
+            padding: 20px;
         }
         header {
             background-color: #ff4757;
             color: white;
-            padding: 20px;
             text-align: center;
             padding: 50px;
+        }
+        h1 {
+            margin: 0;
         }
         .image {
             width: 200px;
             height: 200px;
             border-radius: 50%;
             margin-top: 20px;
+            float: left;
+            margin-right: 20px;
         }
         .section {
             padding: 20px;
@@ -41,19 +43,26 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            clear: both;
+            transition: background-color 0.3s;
+        }
+        .light-mode .section {
+            background-color: #fff;
+        }
+        .dark-mode .section {
+            background-color: #444;
         }
         button {
             padding: 15px 25px;
             font-size: 16px;
-            border: none;
-            border-radius: 5px;
             cursor: pointer;
-        }
-        .button {
             background-color: #007BFF;
             color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
         }
-        .button:hover {
+        button:hover {
             background-color: #0056b3;
         }
         .toggle-container {
@@ -100,9 +109,39 @@
         input:checked + .slider:before {
             transform: translateX(26px);
         }
+        .subscribe-btn {
+            background-color: #ff6b81;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .subscribe-btn:hover {
+            background-color: #ff4757;
+        }
+        .comments-section {
+            margin-top: 30px;
+        }
+        .comment {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .comment-name {
+            font-weight: bold;
+        }
+        .comment-message {
+            margin-top: 5px;
+        }
+        .light-mode .comment {
+            background-color: #f9f9f9;
+        }
+        .dark-mode .comment {
+            background-color: #555;
+        }
     </style>
-    <!-- Confetti script -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body class="light-mode">
     <div class="toggle-container">
@@ -118,31 +157,35 @@
             <p>The official fanpage of MrLippie (the famous YouTuber)</p>
         </header>
 
-        <img src="https://yt3.googleusercontent.com/k6VkGNxRedW7Fteo5MFcDfxIlSSh1ePdFoVG3hGW8uQ3SNCW7Bm1eTDvI2fa-w33hR10HCeBMds=s160-c-k-c0x00ffffff-no-rj" alt="MrLippie" class="image">
+        <div class="section">
+            <img src="https://yt3.googleusercontent.com/k6VkGNxRedW7Fteo5MFcDfxIlSSh1ePdFoVG3hGW8uQ3SNCW7Bm1eTDvI2fa-w33hR10HCeBMds=s160-c-k-c0x00ffffff-no-rj" alt="MrLippie" class="image">
+            <a href="https://www.youtube.com/@Mrlippie/featured" class="subscribe-btn" target="_blank">Subscribe to MrLippie!</a>
+        </div>
 
         <div class="section">
             <h2>About MrLippie</h2>
-            <p>MrLippie is a famous YouTuber known for his funny and unique content.</p>
+            <p>MrLippie is the most famous and best YouTuber there is, known for his weird, but funny type of content.</p>
         </div>
 
-        <!-- Subscribe button -->
-        <a href="https://www.youtube.com/@Mrlippie/featured" class="button" id="subscribe-button">Subscribe to MrLippie!</a>
-
-        <!-- Comment section -->
         <div class="section">
             <h2>Leave a message</h2>
             <form id="comment-form">
-                <input type="text" id="name" placeholder="Your name" required><br><br>
-                <textarea id="message" placeholder="Leave a message" rows="4" required></textarea><br><br>
+                <input type="text" id="name" placeholder="Your name" style="width: 100%; padding: 10px; margin-bottom: 10px;" required>
+                <br>
+                <textarea placeholder="Leave a message" rows="4" style="width: 100%; padding: 10px;" required></textarea>
+                <br>
                 <button type="submit" class="button">Submit</button>
             </form>
-            <div id="comments-display"></div>
         </div>
 
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <div id="comments-container"></div>
+        </div>
     </div>
 
     <script>
-        // Light/Dark mode toggle
+        // Switch between light/dark mode
         const toggleSwitch = document.getElementById("mode-toggle");
         toggleSwitch.addEventListener("change", function() {
             if (toggleSwitch.checked) {
@@ -154,39 +197,65 @@
             }
         });
 
-        // Confetti effect function
-        function showConfetti() {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
+        // Get stored comments from localStorage (if any)
+        const storedComments = JSON.parse(localStorage.getItem('comments')) || [];
+
+        // Display stored comments
+        const commentsContainer = document.getElementById('comments-container');
+        function displayComments() {
+            commentsContainer.innerHTML = '';
+            storedComments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+                const commentName = document.createElement('div');
+                commentName.classList.add('comment-name');
+                commentName.textContent = comment.name;
+                const commentMessage = document.createElement('div');
+                commentMessage.classList.add('comment-message');
+                commentMessage.textContent = comment.message;
+                commentDiv.appendChild(commentName);
+                commentDiv.appendChild(commentMessage);
+                commentsContainer.appendChild(commentDiv);
             });
         }
+        displayComments();
 
-        // Add confetti when the submit button is clicked
-        document.getElementById("comment-form").addEventListener("submit", function(event) {
+        // Handle comment form submission
+        const commentForm = document.getElementById('comment-form');
+        commentForm.addEventListener('submit', function(event) {
             event.preventDefault();
-            showConfetti();  // Show confetti when submit is clicked
 
-            // Add comment functionality
-            const name = document.getElementById("name").value;
-            const message = document.getElementById("message").value;
+            const name = document.getElementById('name').value;
+            const message = commentForm.querySelector('textarea').value;
 
-            const commentDisplay = document.getElementById("comments-display");
-            const newComment = document.createElement("div");
-            newComment.innerHTML = `<strong>${name}</strong>: <p>${message}</p>`;
-            commentDisplay.appendChild(newComment);
+            // If message is "/cleancomments", clear all comments
+            if (message === '/cleancomments') {
+                localStorage.removeItem('comments');
+                storedComments.length = 0;  // Clear the stored comments array
+                displayComments();
+                return;  // Prevent further processing
+            }
 
-            // Clear the form after submission
-            document.getElementById("name").value = '';
-            document.getElementById("message").value = '';
-        });
+            if (name && message) {
+                // Create a new comment
+                const newComment = { name, message };
+                storedComments.push(newComment);
 
-        // Add confetti on subscribe button click
-        document.getElementById("subscribe-button").addEventListener("click", function(event) {
-            event.preventDefault();
-            showConfetti();  // Show confetti when subscribe button is clicked
-            window.location.href = this.href;  // Redirect to YouTube channel after confetti
+                // Limit to a maximum of 10 comments
+                if (storedComments.length > 10) {
+                    storedComments.shift();  // Remove the oldest comment
+                }
+
+                // Save the comments to localStorage
+                localStorage.setItem('comments', JSON.stringify(storedComments));
+
+                // Display the updated comments
+                displayComments();
+
+                // Clear the form fields
+                document.getElementById('name').value = '';
+                commentForm.querySelector('textarea').value = '';
+            }
         });
     </script>
 </body>
