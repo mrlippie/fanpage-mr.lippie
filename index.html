@@ -148,7 +148,7 @@
             border-radius: 10px;
             border: 1px solid #ccc;
             font-size: 1em;
-            font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif; /* Zelfde stijl als textarea */
         }
 
         button {
@@ -215,11 +215,11 @@
         let comments = JSON.parse(localStorage.getItem('comments')) || [];
 
         const updateComments = () => {
-            commentsDiv.innerHTML = ''; // Leeg de comments sectie
-            comments.forEach((comment) => {
+            commentsDiv.innerHTML = '';
+            comments.forEach((comment, index) => {
                 const commentDiv = document.createElement('div');
                 commentDiv.classList.add('comment');
-                commentDiv.textContent = ${comment.name}: ${comment.message}; // Correcte template literal
+                commentDiv.textContent = `${comment.name}: ${comment.message}`;
                 commentsDiv.appendChild(commentDiv);
             });
         };
@@ -236,20 +236,20 @@
                 comments = [];
             } else if (message.trim() && name.trim()) {
                 if (comments.length >= 10) {
-                    comments.shift(); // Verwijder het eerste comment als er al 10 zijn
+                    comments.shift();
                 }
                 comments.push({ name, message });
             }
 
-            localStorage.setItem('comments', JSON.stringify(comments)); // Bewaar comments in localStorage
-            updateComments(); // Werk de comments bij
+            localStorage.setItem('comments', JSON.stringify(comments));
+            updateComments();
 
-            // Leeg de invoervelden
+            // Clear the input fields
             document.getElementById('name').value = '';
             document.getElementById('message').value = '';
         });
 
-        updateComments(); // Begin met het bijwerken van de comments bij het laden van de pagina
+        updateComments();
     </script>
 </body>
 </html>
