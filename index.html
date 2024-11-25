@@ -206,50 +206,88 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js"></script>
+
     <script>
-        const toggleSwitch = document.getElementById('mode-toggle');
-        const body = document.body;
-        const commentsDiv = document.getElementById('comments');
-        const submitButton = document.getElementById('submit-comment');
-
-        let comments = JSON.parse(localStorage.getItem('comments')) || [];
-
-        const updateComments = () => {
-            commentsDiv.innerHTML = ''; // Leeg de comments sectie
-            comments.forEach((comment) => {
-                const commentDiv = document.createElement('div');
-                commentDiv.classList.add('comment');
-                commentDiv.textContent = `${comment.name}: ${comment.message}`; // Correcte template literal
-                commentsDiv.appendChild(commentDiv);
-            });
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPq_Ne7qyMmvMv5HB4yvRttR4_RVFTaWY",
+            authDomain: "mrlippie-e902d.firebaseapp.com",
+            projectId: "mrlippie-e902d",
+            storageBucket: "mrlippie-e902d.firebasestorage.app",
+            messagingSenderId: "647573705899",
+            appId: "1:647573705899:web:48f2efd835ff2027e493ee",
+            measurementId: "G-HJP2XE9JE8"
         };
 
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app); // Get a reference to the database
+        const commentsRef = ref(database, 'comments'); // Reference to the 'comments' node
+
+        // Handle Dark Mode toggle
+        const toggleSwitch = document.getElementById('mode-toggle');
+        const body = document.body;
         toggleSwitch.addEventListener('change', () => {
             body.classList.toggle('dark-mode');
         });
 
+        // Handle comment submission
+        const submitButton = document.getElementById('submit-comment');
         submitButton.addEventListener('click', () => {
             const name = document.getElementById('name').value;
             const message = document.getElementById('message').value;
 
             if (message.startsWith('/cleancomments')) {
-                comments = [];
+                remove(commentsRef); // Clear all comments if command is detected
             } else if (message.trim() && name.trim()) {
-                if (comments.length >= 10) {
-                    comments.shift(); // Verwijder het eerste comment als er al 10 zijn
-                }
-                comments.push({ name, message });
+                const newCommentRef = push(commentsRef); // Push a new comment
+                set(newCommentRef, {
+                    name: name,
+                    message: message,
+                });
             }
 
-            localStorage.setItem('comments', JSON.stringify(comments)); // Bewaar comments in localStorage
-            updateComments(); // Werk de comments bij
-
-            // Leeg de invoervelden
+            // Clear input fields
             document.getElementById('name').value = '';
             document.getElementById('message').value = '';
         });
 
-        updateComments(); // Begin met het bijwerken van de comments bij het laden van de pagina
+        // Retrieve and display comments
+        const commentsDiv = document.getElementById('comments');
+        const updateComments = () => {
+            get(commentsRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    commentsDiv.innerHTML = ''; // Clear current comments
+                    snapshot.forEach((childSnapshot) => {
+                        const comment = childSnapshot.val();
+                        const commentDiv = document.createElement('div');
+                        commentDiv.classList.add('comment');
+                        commentDiv.textContent = `${comment.name}: ${comment.message}`;
+                        commentsDiv.appendChild(commentDiv);
+                    });
+                } else {
+                    commentsDiv.innerHTML = 'No comments yet.';
+                }
+            });
+        };
+
+        updateComments(); // Fetch comments when page loads
+
+        // Real-time synchronization of comments
+        import { onValue } from "firebase/database";
+        onValue(commentsRef, (snapshot) => {
+            commentsDiv.innerHTML = ''; // Clear current comments
+            snapshot.forEach((childSnapshot) => {
+                const comment = childSnapshot.val();
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+                commentDiv.textContent = `${comment.name}: ${comment.message}`;
+                commentsDiv.appendChild(commentDiv);
+            });
+        });
     </script>
 </body>
 </html>
