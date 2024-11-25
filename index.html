@@ -121,6 +121,21 @@
         .subscribe-btn:hover {
             background-color: #ff4757;
         }
+        .comments-section {
+            margin-top: 30px;
+        }
+        .comment {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .comment-name {
+            font-weight: bold;
+        }
+        .comment-message {
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -140,7 +155,7 @@
         <div class="section">
             <!-- Foto van MrLippie en knop naast de foto -->
             <img src="https://yt3.googleusercontent.com/k6VkGNxRedW7Fteo5MFcDfxIlSSh1ePdFoVG3hGW8uQ3SNCW7Bm1eTDvI2fa-w33hR10HCeBMds=s160-c-k-c0x00ffffff-no-rj" alt="MrLippie" class="image">
-            <a href="https://www.youtube.com/MrLippie" class="subscribe-btn" target="_blank" style="margin-top: 40px;">Abonneer op MrLippie!</a>
+            <a href="https://www.youtube.com/@Mrlippie/featured" class="subscribe-btn" target="_blank" style="margin-top: 40px;">Subscribe to MrLippie!</a>
         </div>
 
         <div class="section">
@@ -149,20 +164,26 @@
         </div>
 
         <div class="section">
-            <h2>Laat een bericht achter</h2>
-            <!-- Formulier voor fans om berichten achter te laten -->
-            <form>
-                <textarea placeholder="Leave a message" rows="4" style="width: 100%;"></textarea>
+            <h2>Leave a message</h2>
+            <!-- Form for users to leave a message -->
+            <form id="comment-form">
+                <input type="text" id="name" placeholder="Your name" style="width: 100%; padding: 10px; margin-bottom: 10px;" required>
                 <br>
-                <button type="submit" class="button">Verstuur</button>
+                <textarea placeholder="Leave a message" rows="4" style="width: 100%; padding: 10px;" required></textarea>
+                <br>
+                <button type="submit" class="button">Submit</button>
             </form>
+        </div>
+
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <div id="comments-container"></div>
         </div>
     </div>
 
     <script>
-        // Switch tussen light/dark mode
+        // Switch between light/dark mode
         const toggleSwitch = document.getElementById("mode-toggle");
-
         toggleSwitch.addEventListener("change", function() {
             if (toggleSwitch.checked) {
                 document.body.classList.remove("light-mode");
@@ -170,6 +191,41 @@
             } else {
                 document.body.classList.remove("dark-mode");
                 document.body.classList.add("light-mode");
+            }
+        });
+
+        // Handling comment form submission
+        const commentForm = document.getElementById('comment-form');
+        const commentsContainer = document.getElementById('comments-container');
+
+        commentForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const message = commentForm.querySelector('textarea').value;
+            
+            if (name && message) {
+                // Create a new comment
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+                
+                const commentName = document.createElement('div');
+                commentName.classList.add('comment-name');
+                commentName.textContent = name;
+                
+                const commentMessage = document.createElement('div');
+                commentMessage.classList.add('comment-message');
+                commentMessage.textContent = message;
+                
+                commentDiv.appendChild(commentName);
+                commentDiv.appendChild(commentMessage);
+                
+                // Add comment to the comments section
+                commentsContainer.appendChild(commentDiv);
+                
+                // Clear the form fields
+                document.getElementById('name').value = '';
+                commentForm.querySelector('textarea').value = '';
             }
         });
     </script>
